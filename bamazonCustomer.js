@@ -80,34 +80,47 @@ function readInventory() {
             } else {
 
                 // New query to update quantity in inventory table
-                connection.query("UPDATE product_quantity SET ? WHERE ?",
+                connection.query("UPDATE inventory SET ? WHERE ?",
                 [
                 {
-                    product_quantity: chosenProductQuantity
+                    product_quantity: newQuantity
                 },
                 {
                     product_name: chosenProduct
                 }
                 ], function (err, res) {
                     console.log("You have bought " + answers.answer2 + " " + chosenProduct + "s.")
+
                     // Display new updated information on bought item
                     console.log("====================Completed Transaction====================");
                     console.log("Product ID: " + answers.answer1);
                     console.log("Product Name: " + chosenProduct);
                     console.log("Updated Stock: " + newQuantity + "\n");
-
-                    // Allow user to buy another product
-                   
+                    secondSheBang();
                 });
-
             }
-            readInventory();
+            
+            
         });
         
     });
 }
-//end of the line
 
-
-   
-
+function secondSheBang() {
+    // Allow user to buy another product
+    inquirer.prompt(
+    {
+        name: "answer3",
+        type: "list",
+        message: "Keep shopping?",
+        choices: ["Yes", "No"]
+    }
+    ).then(answers =>  {
+        if (answers.answer3 === "Yes") {
+        readInventory();
+        } else {
+        console.log("Thank you for shopping on bamazon")
+        connection.end();
+        }
+    });
+}
