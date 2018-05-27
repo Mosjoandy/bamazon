@@ -1,6 +1,7 @@
 var inquirer = require('inquirer');
 var mysql = require("mysql");
 
+// Connection to local db
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -9,59 +10,104 @@ var connection = mysql.createConnection({
     database: "bamazondb"
 });
 
+// Initial connection
 connection.connect(function(err, res) {
     if (err) throw err;
-    console.log("You are connected to BamazonDB");
+    console.log("You are connected to BamazonDB\n");
 });
 
+// setting up variables for inside the connection query
+var chosenProduct;
+var chosenQuantity;
 
-connection.query("SELECT * FROM inventory", function(err, res) {
-    if (err) throw err;
+readInventory();
 
-    for (var i = 0; i < res.length; i++) {
-    console.log("Product: " + res[i].product_name + " || Price: $" + res[i].product_price + " || Stock: " + res[i].product_quantity + " || ID: " + res[i].id + "\n");
-    }
+function readInventory() {
+    connection.query("SELECT * FROM inventory", function(err, res) {
+        if (err) throw err;
 
-    inquirer.prompt([
-        {
-        name: "answer1",
-        type: "input",
-        message: "To purchase, enter product ID"
-        },
-        {
-        name: "answer2",
-        type: "input",
-        message: "How many desired?"
-        }
-    ]).then(answers => {
-        var chosenProduct;
-        var chosenQuantity;
+        // Display all current products id, name, price, and quantity
         for (var i = 0; i < res.length; i++) {
-            if (parseInt(answers.answer1) ===  res[i].id) {
-                chosenProduct = res[i].product_name;
-                chosenQuantity = res[i].product_quantity;
-            }
+        console.log("Product: " + res[i].product_name + " || Price: $" + res[i].product_price + " || Stock: " + res[i].product_quantity + " || ID: " + res[i].id + "\n");
         }
-        console.log("Product ID: " + answers.answer1);
-        console.log("Buy: " + chosenProduct);
-        console.log("Stock: " + chosenQuantity);
-        console.log("====================Processing====================");
+        firstSheBang();
+    });
+}
+    // Run the inquire for user
+    function firstSheBang() {
+        connection.query("SELECT * FROM inventory", function(err, res) {
+            if (err) throw err;
+
+        // Ask for user input
+        inquirer.prompt([
+            {
+                // User picks ID from inventory table
+            name: "answer1",
+            type: "input",
+            message: "To purchase, enter product ID"
+            },
+            {
+                // User picks how many of that item they want to buy
+            name: "answer2",
+            type: "input",
+            message: "How many desired?"
+            }
+        ]).then(answers => {
+
+            // Change answer in to an intenger, then match it to the inventory table's id
+            for (var i = 0; i < res.length; i++) {
+                if (parseInt(answers.answer1) ===  res[i].id) {
+
+                    // set global variables as inventory table items
+                    chosenProduct = res[i].product_name;
+                    chosenProductQuantity = res[i].product_quantity;
+                }
+            }
+
+            // Display what user chose to buy
+            console.log("Product ID: " + answers.answer1);
+            console.log("Buy: " + chosenProduct);
+            console.log("Current Stock: " + chosenProductQuantity);
+            console.log("====================Processing====================");
+            
+            // Changing inventory stock of item chosen to subtract desired quantity from total stock
+            var newQuantity = (chosenProductQuantity - answers.answer2);
+            
+            // If user wants to buy more than the current stock
+            if (newQuantity < 0) {
+                console.log("You cannot buy more than the current stock\n");
+                firstSheBang();
+            } else {
+
+                // New query to update quantity in inventory table
                 connection.query("UPDATE product_quantity SET ? WHERE ?",
                 [
                 {
-                    product_quantity: (product_quantity - chosenQuantity)
+                    product_quantity: chosenProductQuantity
                 },
                 {
                     product_name: chosenProduct
                 }
                 ], function (err, res) {
+                    console.log("You have bought " + answers.answer2 + " " + chosenProduct + "s.")
+                    // Display new updated information on bought item
                     console.log("====================Completed Transaction====================");
-                    console.log("Product: " + chosenProduct);
-                    console.log("Stock: " + res[i].product_quantity);
-                }
-            );
+                    console.log("Product ID: " + answers.answer1);
+                    console.log("Product Name: " + chosenProduct);
+                    console.log("Updated Stock: " + newQuantity + "\n");
+
+                    // Allow user to buy another product
+                   
+                });
+
+            }
+            readInventory();
+        });
         
     });
-
+}
 //end of the line
-});
+
+
+   
+
