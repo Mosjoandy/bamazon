@@ -67,23 +67,30 @@ function readInventory() {
     });
 }
 
+// functino for checking items that have low inventory
 function needMorePylons() {
     connection.query("SELECT * FROM inventory WHERE product_quantity", function(err, res) {
         if (err) throw err;
 
         console.log("====================Processing====================");
         console.log("====================Completed=====================");
-var sufficientProducts;
+
+        // Making new variable outside of forloop, if no items are stated in the loop, then var will remain undefined
+        var sufficientProducts;
+
         // For loop to check if product quantity is below a threshold (10)
         for (var i = 0; i < res.length; i++) {
             if (res[i].product_quantity <= 10 ) {
                 sufficientProducts = res[i].product_name;
+
                 // Display to manager which items match the criteria above
                 console.log("\nProducts with low stock \n")
                 console.log("Name: " + res[i].product_name + " || Stock: " + res[i].product_quantity + "\n");
             }
         }
-        if (sufficientProducts === "") {
+
+        // If undefined, inventory is good
+        if (sufficientProducts === undefined) {
             console.log("\nAll Products have sufficient inventory\n")
         }
         nexusBuildsProbes()
@@ -132,7 +139,7 @@ function buildingMorePylons() {
         
         // If manager wants to buy more than the current stock
         if (newQuantity < 0) {
-            console.log("You cannot modify the stock to be negative, so you must not be a real manager!\n");
+            console.log("\nYou cannot modify the stock to be negative, so you must not be a real manager!\n");
             connection.end();
         } else {
 
@@ -146,7 +153,7 @@ function buildingMorePylons() {
                 product_name: chosenProduct
             }
             ], function (err, res) {
-                console.log("You have added " + answers.answer2 + " " + chosenProduct + "s to the product inventory.")
+                console.log("\nYou have added " + answers.answer2 + " " + chosenProduct + "s to the product inventory.\n")
 
                 // Display new updated information on modified item
                 console.log("====================Completed====================");
@@ -157,6 +164,55 @@ function buildingMorePylons() {
             });
         }
     });
+    });
+}
+
+// Function that adds new item to the bamazondb
+function buildCyberneticsCore() {
+    inquirer.prompt([
+        {
+            name: "answer1",
+            type: "input",
+            message: "Name of product?"
+        },
+        {
+            name: "answer2",
+            type: "list",
+            message: "What department does this product belong to?",
+            choices: ["Toys", "Clothing", "Electronics", "Essentials"]
+        },
+        {
+            name: "answer3",
+            type: "input",
+            message: "Price of product?"
+        },
+        {
+            name: "answer4",
+            type: "input",
+            message: "Quantity to add?"
+        }
+    ]).then(answers => {
+        connection.query("INSERT INTO inventory SET ?", 
+            {
+                // Adding a new row with information gained from inquirer
+                product_name: answers.answer1,
+                department_name: answers.answer2,
+                product_price: parseInt(answers.answer3),
+                product_quantity: parseInt(answers.answer4)
+            },
+        function(err, res) {
+            if (err) throw err
+
+            // Display information to manager confirming new addition
+            console.log("====================Processing====================\n");
+            console.log(res.affectedRows + " added to inventory\n");
+            console.log("====================Completed====================\n");
+            console.log("New Product Information:");
+            console.log("Product Name: " + answers.answer1);
+            console.log("Product Price: " + answers.answer3);
+            console.log("Product Stock: " + answers.answer4 + "\n");
+            nexusBuildsProbes()
+        });
     });
 }
 
