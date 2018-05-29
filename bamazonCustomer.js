@@ -22,17 +22,19 @@ var chosenQuantity;
 
 readInventory();
 
+// Make function that shows user all inventory
 function readInventory() {
     connection.query("SELECT * FROM inventory", function(err, res) {
         if (err) throw err;
 
-        // Display all current products id, name, price, and quantity
+        // For loop to display all current products id, name, price, and quantity
         for (var i = 0; i < res.length; i++) {
         console.log("Product: " + res[i].product_name + " || Price: $" + res[i].product_price + " || Stock: " + res[i].product_quantity + " || ID: " + res[i].id + "\n");
         }
         firstSheBang();
     });
 }
+
     // Run the inquire for user
     function firstSheBang() {
         connection.query("SELECT * FROM inventory", function(err, res) {
@@ -54,7 +56,7 @@ function readInventory() {
             }
         ]).then(answers => {
 
-            // Change answer in to an intenger, then match it to the inventory table's id
+            // Change answer in to an integer, then match it to the inventory table's id
             for (var i = 0; i < res.length; i++) {
                 if (parseInt(answers.answer1) ===  res[i].id) {
 
@@ -99,15 +101,12 @@ function readInventory() {
                     secondSheBang();
                 });
             }
-            
-            
         });
-        
     });
 }
 
+// Function to give choice to user to buy more or end connection
 function secondSheBang() {
-    // Allow user to buy another product
     inquirer.prompt(
     {
         name: "answer3",
