@@ -22,13 +22,13 @@ connection.connect(function(err, res) {
 function nexusBuildsProbes() {
     inquirer.prompt([
         {
-        name: "overLord",
+        name: "highTemplar",
         type: "list",
         message: "Select an option:",
         choices: ["Current Stock", "Low Inventory Products", "Add To Inventory", "Add New Product", "Exit"]
         }
     ]).then(answers => {
-        switch(answers.overLord) {
+        switch(answers.highTemplar) {
             case "Current Stock":
             readInventory();
             break;
@@ -61,7 +61,11 @@ function readInventory() {
         console.log("====================Completed=====================");
         // For loop to display all current products id, name, price, and quantity
         for (var i = 0; i < res.length; i++) {
-        console.log("Product: " + res[i].product_name + " || Price: $" + res[i].product_price + " || Stock: " + res[i].product_quantity + " || ID: " + res[i].id + "\n");
+        console.log("Product: " + res[i].product_name + 
+                    " || Price: $" + res[i].product_price + 
+                    " || Stock: " + res[i].product_quantity + 
+                    " || Product Sales: $" + res[i].product_sales + 
+                    " || ID: " + res[i].id + "\n");
         }
         nexusBuildsProbes()
     });
@@ -198,7 +202,8 @@ function buildCyberneticsCore() {
                 product_name: answers.answer1,
                 department_name: answers.answer2,
                 product_price: parseInt(answers.answer3),
-                product_quantity: parseInt(answers.answer4)
+                product_quantity: parseInt(answers.answer4),
+                product_sales: parseInt(0)
             },
         function(err, res) {
             if (err) throw err

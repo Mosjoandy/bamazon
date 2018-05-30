@@ -19,6 +19,8 @@ connection.connect(function(err, res) {
 // setting up variables for inside the connection query
 var chosenProduct;
 var chosenQuantity;
+var chosenProductPrice;
+var chosenProductSalesStart;
 
 readInventory();
 
@@ -29,7 +31,10 @@ function readInventory() {
 
         // For loop to display all current products id, name, price, and quantity
         for (var i = 0; i < res.length; i++) {
-        console.log("Product: " + res[i].product_name + " || Price: $" + res[i].product_price + " || Stock: " + res[i].product_quantity + " || ID: " + res[i].id + "\n");
+        console.log("Product: " + res[i].product_name + 
+                    " || Price: $" + res[i].product_price + 
+                    " || Stock: " + res[i].product_quantity + 
+                    " || ID: " + res[i].id + "\n");
         }
         firstSheBang();
     });
@@ -63,6 +68,8 @@ function readInventory() {
                     // set global variables as inventory table items
                     chosenProduct = res[i].product_name;
                     chosenProductQuantity = res[i].product_quantity;
+                    chosenProductPrice = res[i].product_price;
+                    chosenProductSalesStart = res[i].product_sales;
                 }
             }
 
@@ -89,9 +96,13 @@ function readInventory() {
                 },
                 {
                     product_name: chosenProduct
+                },
+                {
+                    product_sales: (parseInt(chosenProductSalesStart) + (parseInt(answers.answer2) * parseInt(chosenProductPrice)))
                 }
                 ], function (err, res) {
-                    console.log("You have bought " + answers.answer2 + " " + chosenProduct + "s.")
+                    console.log("You have spent $" + (parseInt(answers.answer2) * parseInt(chosenProductPrice)));
+                    console.log("You have bought " + answers.answer2 + " " + chosenProduct + "s.");
 
                     // Display new updated information on bought item
                     console.log("====================Completed Transaction====================");
