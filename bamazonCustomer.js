@@ -69,7 +69,7 @@ function readInventory() {
                     chosenProduct = res[i].product_name;
                     chosenProductQuantity = res[i].product_quantity;
                     chosenProductPrice = res[i].product_price;
-                    chosenProductSalesStart = res[i].product_sales;
+    chosenProductSalesStart = res[i].product_sales;
                 }
             }
 
@@ -81,6 +81,8 @@ function readInventory() {
             
             // Changing inventory stock of item chosen to subtract desired quantity from total stock
             var newQuantity = (chosenProductQuantity - answers.answer2);
+    var newSales = (parseInt(answers.answer2) * chosenProductPrice);
+    var totalSales = (chosenProductSalesStart + newSales);
             
             // If user wants to buy more than the current stock
             if (newQuantity < 0) {
@@ -88,6 +90,17 @@ function readInventory() {
                 firstSheBang();
             } else {
 
+                connection.query("UPDATE inventory SET ? WHERE ?",
+                [
+                {
+                    product_sales: totalSales
+                },
+                {
+                    product_name: chosenProduct
+                }
+                ], function (err, res) {
+                    console.log("You have spent $" + (parseInt(answers.answer2) * parseInt(chosenProductPrice)));
+                });
                 // New query to update quantity in inventory table
                 connection.query("UPDATE inventory SET ? WHERE ?",
                 [
@@ -96,12 +109,8 @@ function readInventory() {
                 },
                 {
                     product_name: chosenProduct
-                },
-                {
-                    product_sales: (parseInt(chosenProductSalesStart) + (parseInt(answers.answer2) * parseInt(chosenProductPrice)))
                 }
                 ], function (err, res) {
-                    console.log("You have spent $" + (parseInt(answers.answer2) * parseInt(chosenProductPrice)));
                     console.log("You have bought " + answers.answer2 + " " + chosenProduct + "s.");
 
                     // Display new updated information on bought item
