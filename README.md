@@ -3,6 +3,7 @@
 ## Overview
 
 ### Customer
+
 This program is designed for terminal use only. Using the command "node bamazonCustomer.js, will give the user a list of avaiable products on the bamazon database and an option to buy. When the user selects a product ID from the list, they can then select a quantity. The user will be displayed their purchase.
 
 * * *
@@ -11,6 +12,7 @@ This program is designed for terminal use only. Using the command "node bamazonC
 * * * 
 
 ### Manager
+
 The manager mode program is terminal only as well, using the comand node bamazonManager.js. 5 options are provided for the manager to view inventory, see what products have low stock, add stock to products, add items to the inventory, and a quit option.
 
 * * *
@@ -21,7 +23,10 @@ The manager mode program is terminal only as well, using the comand node bamazon
 
 ## Process
 
+Video for usage, includes both Customer and Manager: https://drive.google.com/file/d/1BtSFB-DVqm2QdgQK9XYmkUVQJVX7NAtZ/view
+
 ### Customer
+
 - The user inputs "node bamazonCustomer.js".
 - The user is presented with an option to purchase based on product ID.
 - Once the user inputs a product ID, another prompt will appear asking how much of the product they would like to buy.
@@ -33,6 +38,7 @@ The manager mode program is terminal only as well, using the comand node bamazon
 * * *
 
 ### Manager
+
 - The user inputs "node bamazonManager.js".
 - The user is presented with 5 options:
     - Current Stock - which displays all the products available, their names, quantities, id's, prices, and sales.
